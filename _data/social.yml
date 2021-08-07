@@ -1,9 +1,9 @@
 - title: Email
-  url: mailto://vszhub@gmail.com
+  url: mailto://2439166979@qq.com
   icon: fas fa-envelope
-- title: Twitter
-  url: https://twitter.com/vszhub
-  icon: fab fa-twitter
+- title: Bilibili
+  url: https://space.bilibili.com/30482063
+  icon: fas fa-desktop
 - title: GitHub
-  url: https://github.com/vszhub/not-pure-poole
+  url: https://github.com/eggplantisme
   icon: fab fa-github

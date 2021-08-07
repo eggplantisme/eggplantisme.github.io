@@ -1,11 +1,11 @@
 # Setup
-title: Not Pure Poole
-description: A simple, beautiful, and powerful Jekyll theme for blogs
-url: https://vszhub.github.io
-avatar: /avatar.jpeg
+title: Eggplant
+description: Be brave, be strong.
+url: https://eggplantisme.github.io
+avatar: /avatar.jpg
 paginate: 5
 permalink: pretty
-cover_image: /bg.jpeg
+cover_image: /bg.jpg
 
 # Gems
 plugins:
@@ -31,12 +31,12 @@ exclude:
 twitter:
   username: vszhub
   card: summary
-logo: logo.png
+logo: logo.ico
 social:
-  name: Songzi Vong
+  name: eggplant
   links:
     - https://twitter.com/vszhub
-    - https://github.com/vszhub
+    - https://github.com/eggplantisme
 google_site_verification: xxxxx
 lang: en
 
@@ -54,6 +54,6 @@ sass:
 
 # Specify the author for blog posts
 author:
-  name: Songzi Vong
-  url: https://github.com/vszhub/
-  email: vszhub@gmail.com
+  name: eggplantisme
+  url: https://github.com/eggplantisme/
+  email: 2439166979@qq.com
