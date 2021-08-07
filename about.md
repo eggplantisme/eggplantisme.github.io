@@ -3,6 +3,16 @@ layout: page
 title: About
 ---
 
-**Not Pure Poole** is a simple, beautiful, and powerful Jekyll theme for blogs. It is built on [Poole](https://github.com/poole/poole) and [Pure](https://purecss.io/).
+Hello~，这里是我的博客站，之前是在cnblog上写了一点博客，之后希望可以在这里分享我的想法，学习，喜好等等。
 
-For more information about Not Pure Poole, please browse the [README](https://github.com/vszhub/not-pure-poole) file.
+关于我，一个没那么宅的宅男。
+- 喜欢玩游戏，像LOL，明日方舟，泰拉瑞亚，空洞骑士等等...。
+- 运动方面喜欢打羽毛球。
+- 棋类方面喜欢中国象棋。
+- 由于专业的原因会一点编程，如python等。
+- 番剧方面近期没有怎么追番，曾经看过的比较喜欢的动漫有《中二病也要谈恋爱》《钢之炼金术师 FA》《死亡笔记》等等...。
+
+即将去荷兰留学，希望疫情早日过去，诸事顺意！
+
+————————————————————————————————2021.08.07
+
