@@ -4,6 +4,14 @@
   {% include head.html %}
 
   <body>
+    <link rel="stylesheet" href="{{ 'assets/APlayer/APlayer.min.css' | relative_url }}">
+    <script src="{{ 'assets/APlayer/APlayer.min.js' | relative_url }}"></script>
+    <script>
+      var static_Path = '{{ "assets/" | relative_url }}';
+      var home_Path = window.location.host;
+      var message_Path = '{{ "assets/live2d/" | relative_url }}';
+    </script>
+    
     <div class="container pure-g">
       {%- assign cover_bg_color = site.cover_bg_color | default: "rgb(40, 73, 77)" -%}
       {%- assign cover_color    = site.cover_color    | default: "rgb(255, 255, 255)" -%}
@@ -41,8 +49,7 @@
       {%- include google-analytics.html -%}
     {%- endif -%}
 
-    <link rel="stylesheet" href="{{ 'assets/APlayer/APlayer.min.css' | relative_url }}">
-    <script src="{{ 'assets/APlayer/APlayer.min.js' | relative_url }}"></script>
+    
     <!-- APlayer 播放器 -->
     <div id="aplayer" style="display: none; color: #000;"></div>
 
@@ -76,11 +83,6 @@
         </div>
     </div>
     <div id="open_live2d">召唤看板娘</div>
-    <script>
-        var static_Path = '{{ "assets/" | relative_url }}';
-        var home_Path = window.location.host;
-        var message_Path = '{{ "assets/live2d/" | relative_url }}';
-    </script>
     <script type="text/javascript" src="{{ 'assets/live2d/js/live2d.js' | relative_url }}"></script>
     <script type="text/javascript" src="{{ 'assets/live2d/js/message.js' | relative_url }}"></script>
     <script type="text/javascript">
