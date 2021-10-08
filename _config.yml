@@ -59,4 +59,6 @@ author:
   email: 2439166979@qq.com
 
 markdown: kramdown
+# markdown: redcarpet
+
 future: true
