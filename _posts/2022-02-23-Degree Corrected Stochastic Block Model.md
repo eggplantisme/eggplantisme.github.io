@@ -3,6 +3,7 @@ layout: post
 title: Degree Corrected Stochastic Block Model
 tags: [Algorithm]
 date: 2022-02-23 18:46
+toc: true
 ---
 
 本文基于论文2010 - Stochastic blockmodels and community structure in networks. 作为DC-SBM的学习笔记。
