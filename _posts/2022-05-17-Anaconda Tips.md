@@ -24,5 +24,12 @@
 
 ## Jupyter Notebook
 
-安装扩展：mamba install -c conda-forge jupyter_contrib_nbextensions
+- 安装扩展：mamba install -c conda-forge jupyter_contrib_nbextensions
 
+- 让jupyer notebook识别新创建的环境：
+
+  在对应的环境下安装ipykernel：`conda install ipykernel`。
+
+  然后在对应环境下执行命令: `python -m ipykernel install --user --name {env_name}`
+
+  

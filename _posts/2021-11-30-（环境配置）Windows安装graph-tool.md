@@ -31,3 +31,14 @@ deb [ arch=amd64 ] https://downloads.skewed.de/apt DISTRIBUTION main
 DISTRIBUTION can be "bullseye, buster, sid, bionic, eoan, focal, groovy"
 ```
 没有给出明确的选哪个DISTRIBUTION，根据博客[ubuntu18.04下安装graph-tool](https://blog.csdn.net/HUSTHY/article/details/108260470)里，才得知是要选bionic的。接下来顺利安装graph-tool，并用传统的pip3 install方式安装sklearn，且两个库都能import，说明在linux下这俩库没啥冲突。最终成功通过import部分，算是可以开始看代码了。（配置环境真的是十分考验耐心和google技术，配完后觉得不难，但寻找正确的配置方法的过程还是很揪心）
+
+--- 22/6/23
+
+如果遇到运行时出现zstandard的错误，如：
+
+> ImportError: zstd C API versions mismatch; Python bindings were not compiled/linked against expected zstd version (10502 returned by the lib, 10501 hardcoded in zstd headers, 10501 hardcoded in the cext)
+
+重新安装zstandard, 用命令:
+
+> conda install -c indygreg zstandard
+

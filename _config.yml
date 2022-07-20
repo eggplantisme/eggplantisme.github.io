@@ -4,7 +4,7 @@ description: Be brave, be strong.
 url: https://eggplantisme.github.io
 avatar: /avatar.jpg
 paginate: 5
-permalink: pretty
+permalink: /:categories/:year/:month/:day/:title
 cover_image: /bg.jpg
 
 # Gems
