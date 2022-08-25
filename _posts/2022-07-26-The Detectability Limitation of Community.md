@@ -45,11 +45,12 @@ $M$ - the number of edges.
 
 ### Question
 
-1. 已知图G，SBM的参数$\theta = \left \{ q, \left\{n_a\right\}, \left\{p_{ab}\right\} \right \}$最可能的值是什么: parameter learning
-
+1. 已知图G，SBM的参数 
+$$ \begin{aligned}\theta=\left\{q,\left\{n_a\right\},\left\{p_{ab}\right\}\right\}\end{aligned} $$
+ 最可能的值是什么: parameter learning
 2. 已知图G和参数$\theta$，节点的组标签$q_i$的最可能的值是什么: inferring the group assignment
 
-对于第2个问题，我们这里可以先考虑一个简单的问题：如何量化标签$\left\{q_i\right\}$的好坏，设真实的标签为$\left\{t_i\right\}$。一个直接的想法是考虑$\left\{q_i\right\}$和$\left\{t_i\right\}$一致的个数，由于我们估计的标签$\left\{q_i\right\}$有着不同的排列，这会影响对一致个数的计算，所以我们可以取所有排列中，结果最好的一个，记作$agreement:A(\left\{t_i\right\},\left\{q_i\right\})=max_\pi\frac{\sum_i\delta_{t_i, \pi(q_i)}}{N}$，其中$\pi$是节点标签不同的排列方式。
+对于第2个问题，我们这里可以先考虑一个简单的问题：如何量化标签$$ \left\{q_i\right\} $$的好坏，设真实的标签为$$ \left\{t_i\right\} $$。一个直接的想法是考虑$$ \left\{q_i\right\} $$和$$ \left\{t_i\right\} $$一致的个数，由于我们估计的标签$$ \left\{q_i\right\} $$有着不同的排列，这会影响对一致个数的计算，所以我们可以取所有排列中，结果最好的一个，记作$$ agreement:A(\left\{t_i\right\},\left\{q_i\right\})=max_\pi\frac{\sum_i\delta_{t_i, \pi(q_i)}}{N} $$，其中$\pi$是节点标签不同的排列方式。
 
 一种简单的估计节点标签的方式是，把所有的标签设为最大的组的标签。以这样的方法为基准，我们可以定义normalized agreement， 叫做overlap
 $$
@@ -67,36 +68,44 @@ $$
 \begin{aligned}P(\left\{q_i\right\},G|\theta)=\prod_{i\neq j}[p_{q_iq_j}^{A_{ij}}(1-p_{q_iq_j})^{1-A_{ij}}]\prod_in_{q_i}\end{aligned}\tag{2.1.1}
 $$
 
-实际情况下，我们是知道网络的图$G$的。我们想要知道$P(\left\{q_i\right\}|G, \theta)$， 根据贝叶斯公式：
+实际情况下，我们是知道网络的图$G$的。我们想要知道 $$ P(\left\{q_i\right\}\vert G, \theta) $$， 根据贝叶斯公式：
 
 $$
 \begin{aligned}P(\left\{q_i\right\}|G, \theta)&=\frac{P(\left\{q_i\right\},G,\theta)}{\sum_{t_i}P(\left\{t_i\right\},G,\theta)}\\&=\frac{P(\left\{q_i\right\},G|\theta)P(\theta)}{\sum_{t_i}P(\left\{t_i\right\},G|\theta)P(\theta)}\\P(\left\{q_i\right\}|G, \theta)&=\frac{P(\left\{q_i\right\},G|\theta)}{\sum_{t_i}P(\left\{t_i\right\},G|\theta)}\end{aligned}\tag{2.1.2}
 $$
 
-这样将(2.1.1)代入(2.1.2)就可以得到$P(\left\{q_i\right\}|G, \theta)$的显式公式。这里解决了一个之前一直比较疑惑的点，当遇到条件概率和联合概率组合起来时就会让人很困惑。例如$P(A|B,C)$应该理解为A在给定B,C下的条件概率呢，还是A给定B的条件概率，和C的联合概率。其实应该是前者理解是正确的，而且
+这样将(2.1.1)代入(2.1.2)就可以得到 $$ P(\left\{q_i\right\}\vert G, \theta) $$ 的显式公式。这里解决了一个之前一直比较疑惑的点，当遇到条件概率和联合概率组合起来时就会让人很困惑。例如$P(A\|B,C)$应该理解为A在给定B,C下的条件概率呢，还是A给定B的条件概率，和C的联合概率。其实应该是前者理解是正确的，而且
+
 $$
 \begin{aligned}P(A|B,C)&=\frac{P(A,B|C)P(C)}{P(B|C)P(C)}=\frac{P(A,B|C)}{P(B|C)}\\&=\frac{P(A,C|B)P(B)}{P(C|B)P(B)}=\frac{P(A,C|B)}{P(C|B)}\end{aligned}
 $$
+
 这样写就看上去好像是后一种理解，但其实应该是前一种理解推出来的。
 
 ### Boltzmann distribution
 
-公式(2.1.2)的右半部分类似于统计物理中的玻尔兹曼分布。假设一个系统由N个粒子构成，每个粒子$i$的状态记作$x_i$。整个系统的状态$\left\{x\right\}$对应的能量为$E(\left\{x\right\})$。则系统状态的玻尔兹曼分布为：
+公式(2.1.2)的右半部分类似于统计物理中的玻尔兹曼分布。假设一个系统由N个粒子构成，每个粒子$i$的状态记作$x_i$。整个系统的状态 $$ \left\{x\right\} $$ 对应的能量为$$ E(\left\{x\right\}) $$。则系统状态的玻尔兹曼分布为：
+
 $$
 p(\left\{x\right\})=\frac{e^{-\beta E(\left\{x\right\})}}{Z(\beta)}, where\ Z(\beta)=\sum_{\left\{x^`\right\} \in S}e^{-\beta E(\left\{x^`\right\})}\tag{2.2.1}
 $$
 
-稳定条件下系统的概率分布与系统能量的关系为(这里$H(\left\{x\right\})$类似于上式中的$E(\left\{x\right\})$):
+稳定条件下系统的概率分布与系统能量的关系为(这里$$ H(\left\{x\right\}) $$类似于上式中的$$ E(\left\{x\right\}) $$ ):
+
 $$
 P(\left\{x\right\})\propto e^{-\beta H(\left\{x\right\})}
 $$
-我们设$\beta=1$，(2.1.2)中的$\left\{q_i\right\}$即为系统的状态，则系统在状态$\left\{q_i\right\}$下的能量$H(\left\{q_i\right\})$(也即Hamiltonian)为
+
+我们设$\beta=1$，(2.1.2)中的$$ \left\{q_i\right\} $$即为系统的状态，则系统在状态$$ \left\{q_i\right\} $$下的能量$$ H(\left\{q_i\right\}) $$(也即Hamiltonian)为
+
 $$
 \begin{aligned}H(\left\{q_i\right\})&=-logP(\left\{q_i\right\}, G|\theta)\\&=-\sum_{i\neq j}[A_{ij}log\ p_{q_iq_j}+(1-A_{ij})log(1-p_{q_iq_j})]-\sum_ilog\ n_{q_i}\\&=-\sum_{i\neq j}[A_{ij}log\ \frac{c_{q_iq_j}}{N}+(1-A_{ij})log(1-\frac{c_{q_iq_j}}{N})]-\sum_ilog\ n_{q_i}\\&=-\sum_{i\neq j}[A_{ij}log\ c_{q_iq_j}+(1-A_{ij})log(1-\frac{c_{q_iq_j}}{N})]-\sum_ilog\ n_{q_i}+\sum_{i\neq j}A_{ij}logN\\H(\left\{q_i\right\})&=-\sum_{i\neq j}[A_{ij}log\ c_{q_iq_j}+(1-A_{ij})log(1-\frac{c_{q_iq_j}}{N})]-\sum_ilog\ n_{q_i}\ (ignore\ MlogN)\end{aligned}\tag{2.2.2}
 $$
-这里忽略掉最后一项，我以为是忽略掉结果中与$\left\{q_i\right\}$无关的一项，论文中的解释是想让这个能量extensive，保持一些属性与N成比例`TODO`。
+
+这里忽略掉最后一项，我以为是忽略掉结果中与$$ \left\{q_i\right\} $$无关的一项，论文中的解释是想让这个能量extensive，保持一些属性与N成比例`TODO`。
 
 这样，这个系统的玻尔兹曼分布以及配分函数(partition function)即为：
+
 $$
 \begin{aligned}\mu(\left\{q_i\right\}|G,\theta)&=\frac{e^{-H(\left\{q_i\right\})}}{\sum_{\left\{q_i\right\}}e^{-H(\left\{q_i\right\})}}\end{aligned}\tag{2.2.3}
 $$
@@ -107,15 +116,18 @@ $$
 
 ### Bayesian for parameter learning
 
-之前假设我们已知了$\theta= \left \{ q, \left\{n_a\right\}, \left\{p_{ab}\right\} \right \}$， 但其实正常情况下我们只知道网络$G$，所以我们需要解决$P(\theta|G)$。根据贝叶斯公式：
+之前假设我们已知了$$ \theta= \left \{ q, \left\{n_a\right\}, \left\{p_{ab}\right\} \right \} $$， 但其实正常情况下我们只知道网络$G$，所以我们需要解决$P(\theta\|G)$。根据贝叶斯公式：
+
 $$
 P(\theta|G)=\frac{P(\theta)}{P(G)}P(G|\theta)=\frac{P(\theta)}{P(G)}\sum_{\left\{q_i\right\}}P(\left\{q_i\right\},G|\theta)
 $$
 
-$p(\theta)$是先验概率(prior)，$P(\theta|G)$是后验概率(posterior)。对于参数$\theta$的分布我们不做任何假设，简单视为uniform。所以最大化后验概率即为最大化$\sum_{\left\{q_i\right\}}P(\left\{q_i\right\},G|\theta)$。根据公式(2.2.2)和(2.2.4)，这就是最大化配分函数$Z(G,\theta)$。而且等价于最小化free energy density：
+$p(\theta)$是先验概率(prior)，$P(\theta\|G)$是后验概率(posterior)。对于参数$\theta$的分布我们不做任何假设，简单视为uniform。所以最大化后验概率即为最大化$$ \sum_{\left\{q_i\right\}}P(\left\{q_i\right\},G\vert \theta) $$。根据公式(2.2.2)和(2.2.4)，这就是最大化配分函数$Z(G,\theta)$。而且等价于最小化free energy density：
+
 $$
 f(G,\theta)=lim_{N\to \infty}\frac{F_N(G,\theta)}{N}=lim_{N\to \infty}\frac{-logZ(G,\theta)}{N}
 $$
+
 但什么是free energy？什么是free energy density？
 
 ### Free Energy
@@ -123,22 +135,31 @@ $$
 #### Thermodynamic potentials
 
 free energy $F(\beta)$是一个重要的热力学势能。考虑公式(2.2.1)表示的一个系统(这里加了一些符号表示)：
+
 $$
 p(\left\{x\right\})=\mu_\beta(\left\{x\right\})=\frac{e^{-\beta E(\left\{x\right\})}}{Z(\beta)}, where\ Z(\beta)=\sum_{\left\{x^`\right\} \in S}e^{-\beta E(\left\{x^`\right\})}
 $$
+
 $Z(\beta)$为配分函数，$\beta$为系统温度$T$的的倒数$\beta=\frac{1}{T}$。free energy即为配分函数$Z(\beta)$的对数乘以负温度。
+
 $$
 F(\beta)=-\frac{1}{\beta}logZ(\beta)\tag{2.4.1}
 $$
+
 另两个重要的势能是internal energy $U(\beta)$和canonical entropy $S(\beta)$。
+
 $$
 \begin{aligned}U(\beta)=\frac{\partial(\beta F(\beta))}{\partial \beta}\\S(\beta)=\beta^2\frac{\partial F(\beta)}{\partial \beta}\end{aligned}\tag{2.4.2}
 $$
+
 进一步推导$F(\beta)$,$U(\beta)$,$S(\beta)$的关系：
+
 $$
-\begin{aligned}U(\beta)&=-\frac{\partial log(Z(\beta))}{\partial \beta}=-\frac{{Z}'(\beta)}{Z(\beta)}\\S(\beta)&=\beta^2\frac{\partial F(\beta)}{\partial \beta}=-\beta^2\frac{\frac{{Z}'(\beta)}{Z(\beta)}\beta-logZ(\beta)}{\beta^2}=logZ(\beta)-\beta\frac{{Z}'(\beta)}{Z(\beta)}\\F(\beta)&=U(\beta)-\frac{1}{\beta}S(\beta)\end{aligned}\tag{2.4.3}
+\begin{aligned}U(\beta)&=-\frac{\partial log(Z(\beta))}{\partial \beta}=-\frac{Z'(\beta)}{Z(\beta)}\\S(\beta)&=\beta^2\frac{\partial F(\beta)}{\partial \beta}=-\beta^2\frac{\frac{Z'(\beta)}{Z(\beta)}\beta-logZ(\beta)}{\beta^2}=logZ(\beta)-\beta\frac{Z'(\beta)}{Z(\beta)}\\F(\beta)&=U(\beta)-\frac{1}{\beta}S(\beta)\end{aligned}\tag{2.4.3}
 $$
-将$Z(\beta)=\sum_{\left\{x^`\right\} \in S}e^{-\beta E(\left\{x^`\right\})}$代入$U(\beta)$,$S(\beta)$中：
+
+将$$ Z(\beta)=\sum_{\left\{x^`\right\} \in S}e^{-\beta E(\left\{x^`\right\})} $$代入$U(\beta)$,$S(\beta)$中：
+
 $$
 \begin{aligned}U(\beta)&=\frac{\sum_{\left\{x^`\right\} \in S}E(\left\{x^`\right\})e^{-\beta E(\left\{x^`\right\})}}{Z(\beta)}\\&=\sum_{\left\{x^`\right\} \in S}\frac{e^{-\beta E(\left\{x^`\right\})}}{Z(\beta)}E(\left\{x^`\right\})\\&=\left \langle E(\left\{x^`\right\}) \right \rangle\end{aligned}\tag{2.4.4}
 $$
@@ -180,6 +201,7 @@ Cavity Method 是统计物理中的一种方法：在Ising模型中，每一个�
 ### Belief Propagation
 
 BP算法迭代的计算网络中节点的边际概率$\psi_r^i$，其表示节点$i$的组标签为$r$的概率。可以想见，$\psi_r^i$是$\overrightarrow{\psi^i}$这个$q$维向量的一项：
+
 $$
 \psi^i=\begin{bmatrix}
  \psi_1^i& \psi_2^i & ... &\psi_q^i 
