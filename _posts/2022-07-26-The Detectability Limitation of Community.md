@@ -53,9 +53,11 @@ $$ \begin{aligned}\theta=\left\{q,\left\{n_a\right\},\left\{p_{ab}\right\}\right
 对于第2个问题，我们这里可以先考虑一个简单的问题：如何量化标签$$ \left\{q_i\right\} $$的好坏，设真实的标签为$$ \left\{t_i\right\} $$。一个直接的想法是考虑$$ \left\{q_i\right\} $$和$$ \left\{t_i\right\} $$一致的个数，由于我们估计的标签$$ \left\{q_i\right\} $$有着不同的排列，这会影响对一致个数的计算，所以我们可以取所有排列中，结果最好的一个，记作$$ agreement:A(\left\{t_i\right\},\left\{q_i\right\})=max_\pi\frac{\sum_i\delta_{t_i, \pi(q_i)}}{N} $$，其中$\pi$是节点标签不同的排列方式。
 
 一种简单的估计节点标签的方式是，把所有的标签设为最大的组的标签。以这样的方法为基准，我们可以定义normalized agreement， 叫做overlap
+
 $$
 overlap:Q(\left\{t_i\right\},\left\{q_i\right\})=max_\pi\frac{\frac{1}{N}\sum_i\delta_{t_i, \pi(q_i)}-max_an_a}{1-max_an_a}
 $$
+
 overlap范围0~1，越高越好，当估计标签完全拟合真实标签时，overlap为1。
 
 ## Bayesian Inference & Statistical Physics
@@ -192,10 +194,12 @@ Sec. IIC. `TODO`
 
 $$\begin{aligned}\mu(\left\{q_i\right\}|G,\theta)&=\frac{e^{-H(\left\{q_i\right\})}}{\sum_{\left\{q_i\right\}}e^{-H(\left\{q_i\right\})}}\end{aligned}$$
 
-我们知道了所有节点标签分布的联合概率分布$\mu(\left\{q_i\right\})$。但若想知道某一个节点标签的分布，即节点标签的边际分布(Marginal Distribution)，我们即需要知道:
+我们知道了所有节点标签分布的联合概率分布 $$ \mu(\left\{q_i\right\}) $$ 。但若想知道某一个节点标签的分布，即节点标签的边际分布(Marginal Distribution)，我们即需要知道:
+
 $$
 v_i(q_i)=\sum_{\left\{q_j\right\}_{j\neq i}}\mu(\left\{q_j\right\}_{j\neq i},q_i)
 $$
+
 Cavity Method 是统计物理中的一种方法：在Ising模型中，每一个粒子的状态依赖于其邻居的状态，如果我们初始化估计每个粒子的状态分布，然后根据邻居节点的状态分布迭代更新本节点的分布，最终收敛到一个分布即为最终的边际分布结果。这个方法类似于Belief Propagation(BP)方法，我们可以利用BP方法估计$v_i(q_i)$。
 
 ### Belief Propagation
@@ -211,66 +215,87 @@ $$
 #### Naive Bayes
 
 一个直观的想法是，节点邻居的边际分布会影响节点自身的边际分布，例如，节点$i$的邻居$j$属于组$s$，而组$r$与组$s$的连边概率为$p_{rs}$。那么这条边$(i,j)$对节点$i$的边际概率$\psi_r^i$的影响因数就是$p_{rs}$。假设节点$i$的不同邻居之间相互独立，考虑到节点$i$的不同邻居，以及每一个邻居属于不同组的边际概率$\psi_s^j$，节点$i$的边际概率与其邻居的边际概率之间的关系为：
+
 $$
 \psi_r^i\propto\prod_{j:(i,j)\in E}\sum_{s=1}^q\psi_s^jp_{rs}
 $$
+
 然后不断迭代这个式子，以至收敛，得到每个节点的边际分布。然而这样的想法太过简化，尤其是邻居之间相互独立的假设。BP算法修改了这个假设，节点的边际分布不互相独立，而是仅通过共同的邻居互相关联。
 
 #### Belief Propagation
 
 BP算法定义每个节点$i$发送给其邻居$j$的信息为$\psi^{i\to j}$。类似公式(3.1.1)，这也是一个$q$维向量，$\psi_r^{i\to j}$含义为$i$假设没有$j$这个邻居，从其他邻居处估计的自身的组标签为$r$的边际概率，所以这个符号$\psi_r^{i\to j}$的含义核心在于**$i$的边际分布**，$^{\to j}$只是一个限定条件: $i$未知$j$这个邻居。
 
-![捕获1](C:\Users\24391\Pictures\捕获1.PNG)
+![捕获1](../../../../assets/img/algorithm/捕获1.PNG)
 
 这样定义之后，如上图所示，$\psi^{i\to j}$即为$i$根据除了$j$之外的邻居$k$，对自身边际分布的估计，借鉴Naive Bayes的思想，可以得知:
+
 $$
 \psi_r^{i\to j}\propto\prod_{\begin{aligned}k:(&i,k)\in E\\&k\neq j\end{aligned}}\sum_{s=1}^q\psi_s^{k\to i}p_{rs}\tag{3.1.2}
 $$
+
 注意，在无向图中，每一条边有两个信息。
 
 BP算法首先初始化每一条边上的信息，然后根据(3.1.2)式迭代直至收敛，最后根据边上的信息计算每一个节点的边际分布：
+
 $$
 \psi_r^i\propto\prod_{j:(i,j)\in E}\sum_{s=1}^q\psi_s^{j\to i}p_{rs}\tag{3.1.3}
 $$
+
 (3.1.2)中$\psi_r^{i\to j}与$$\psi_s^{j\to i}$无关，这阻止了信息回传到自身。BP算法在树状图中一定会收敛，但在一般的图中不一定收敛。但是当图很稀疏时，图中会出现局部树状的现象，这样BP算法会得到边际概率的一个很好的近似。此时，虽然节点自身的边际分布信息会经过一个大圈回到自身，但由于圈子过大，自身信息会被稀释，导致对结果影响不大。
 
 #### BP in SBM
 
-假设目前已知图G，以及生成图G的SBM的参数$\theta=\left \{ q, \left\{n_a\right\}, \left\{p_{ab}\right\} \right \}$。使用BP算法inferring the group assignment。假设节点$i$可以接受每一个节点的信息，那么节点$i$的边际分布为：
+假设目前已知图G，以及生成图G的SBM的参数$$ \theta=\left \{ q, \left\{n_a\right\}, \left\{p_{ab}\right\} \right \} $$。使用BP算法inferring the group assignment。假设节点$i$可以接受每一个节点的信息，那么节点$i$的边际分布为：
+
 $$
 \begin{aligned}\psi_{t_i}^{i\to j}&=\frac{1}{Z^{i\to j}}\prod_{k\in \partial i\setminus  j}\sum_{t_k}p_{t_it_k}^{A_{ik}}(1-p_{t_it_k})^{1-A_{ik}}\psi_{t_k}^{k\to i}\\&=\frac{1}{Z^{i\to j}}\prod_{k\in \partial i\setminus  j}\sum_{t_k}\frac{c_{t_it_k}}{N}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i}\\&=\frac{1}{Z^{i\to j}}\prod_{k\in \partial i\setminus  j}\frac{1}{N^{A_{ik}}}\sum_{t_k}c_{t_it_k}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i}\\&=\frac{1}{Z^{i\to j}}\frac{1}{N^{d_i-1}}\prod_{k\in \partial i\setminus  j}\sum_{t_k}c_{t_it_k}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i},\ d_i:the\ degree\ of\ i\end{aligned}
 $$
+
 此处$\partial i$指代所有能传递给$i$信息的邻居。由于归一化的操作，可以忽略掉连乘项中不含$t_i$的项，即忽略掉$\frac{1}{N^{d_i-1}}$。得到：
+
 $$
 \psi_{t_i}^{i\to j}=\frac{1}{Z^{i\to j}}\prod_{k\in \partial i\setminus  j}\sum_{t_k}c_{t_it_k}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i}
 $$
+
 然而论文中的公式却是：
+
 $$
 \psi_{t_i}^{i\to j}=\frac{1}{Z^{i\to j}}n_{t_i}\prod_{k\in \partial i\setminus  j}\sum_{t_k}c_{t_it_k}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i}\tag{3.1.4}
 $$
+
 多了一项$n_{t_i}$，目前未知缘由`TODO`，我们以论文中的公式往下捋。
 
 由公式(3.1.4)，可以得知边际概率为：
+
 $$
 v_i(t_i)=\psi_{t_i}^i=\frac{1}{Z^{i}}n_{t_i}\prod_{k\in \partial i}\sum_{t_k}c_{t_it_k}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i}\tag{3.1.5}
 $$
+
 这样的迭代方式会对任意一对节点间的信息进行更新，时间复杂度很高$O(N^2)$。然而考虑$N\to \infty$，$i$给非邻居节点$j$发的信息都是一样的，假设$(i,j)\notin E$，$\partial i$表示与$i$连边的邻居：
+
 $$
 \begin{aligned}\psi_{t_i}^{i\to j}&=\frac{1}{Z^{i\to j}}n_{t_i}[\prod_{k\notin \partial i \setminus j}\sum_{t_k}c_{t_it_k}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i}][\prod_{k\in \partial i}\sum_{t_k}c_{t_it_k}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i}]\\&=\frac{1}{Z^{i\to j}}n_{t_i}[\prod_{k\notin \partial i \setminus j}\sum_{t_k}(1-\frac{c_{t_it_k}}{N})\psi_{t_k}^{k\to i}][\prod_{k\in \partial i}\sum_{t_k}c_{t_it_k}^{A_{ik}}\psi_{t_k}^{k\to i}]\\&=\frac{1}{Z^{i\to j}}n_{t_i}[\prod_{k\notin \partial i \setminus j}1-\frac{1}{N}\sum_{t_k}c_{t_it_k}\psi_{t_k}^{k\to i}][\prod_{k\in \partial i}\sum_{t_k}c_{t_it_k}\psi_{t_k}^{k\to i}]\\&\overset{N\to \infty}{=}\frac{1}{Z^{i\to j}}n_{t_i}[\prod_{k\in \partial i}\sum_{t_k}c_{t_it_k}^{A_{ik}}\psi_{t_k}^{k\to i}]\\&=\psi_{t_i}^i\end{aligned}
 $$
+
 其中第二行到第三行用到$\sum_{t_k}\psi_{t_k}^{k\to i}=1$。第三行到第四行中间项化为1：$N\to \infty$时，$\sum_{t_k}c_{t_it_k}\psi_{t_k}^{k\to i}$相比于$N$是个常数，设为$C$。连乘的项数近似为$N$。所以中间项近似为$lim_{N\to \infty}(1-\frac{C}{N})^N=1$。
 
 $i$发给邻居节点$j$的信息为：
+
 $$
 \begin{aligned}\psi_{t_i}^{i\to j}&=\frac{1}{Z^{i\to j}}n_{t_i}[\prod_{k\notin \partial i }\sum_{t_k}c_{t_it_k}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i}][\prod_{k\in \partial i\setminus j}\sum_{t_k}c_{t_it_k}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i}]\\&=\frac{1}{Z^{i\to j}}n_{t_i}[\prod_{k\notin \partial i }1-\frac{1}{N}\sum_{t_k}c_{t_it_k}\psi_{t_k}^{k\to i}][\prod_{k\in \partial i\setminus j}\sum_{t_k}c_{t_it_k}\psi_{t_k}^{k\to i}]\\&=\frac{1}{Z^{i\to j}}n_{t_i}[1-\frac{1}{N}\sum_{k\notin \partial i}\sum_{t_k}c_{t_kt_i}\psi_{t_k}^{k\to i}+O(\frac{1}{N^2})][\prod_{k\in \partial i\setminus j}\sum_{t_k}c_{t_it_k}\psi_{t_k}^{k\to i}]\\&\approx \frac{1}{Z^{i\to j}}n_{t_i}e^{-h_{t_i}}[\prod_{k\in \partial i\setminus j}\sum_{t_k}c_{t_it_k}\psi_{t_k}^{k\to i}],\ h_{t_i}=\frac{1}{N}\sum_{k\notin \partial i}\sum_{t_k}c_{t_kt_i}\psi_{t_k}^{k\to i}\end{aligned}\tag{3.1.6}
 $$
+
 最后一行，利用了$e^{-x}\approx1-x$。然而论文$h_{t_i}$为：
+
 $$
 h_{t_i}=\frac{1}{N}\sum_{k}\sum_{t_k}c_{t_kt_i}\psi_{t_k}^{k}
 $$
+
 第二处不同最后一项$(i,k)\notin E$时，$\psi_{t_k}^{k\to i}=\psi_{t_k}^{k}$，可以理解。第一处不同可能是论文错误`TODO`。
 
 这样，初始化所有信息，经过(3.1.6)不断迭代至收敛，计算边际概率为：
+
 $$
 v_i(t_i)=\psi_{t_i}^i=\frac{1}{Z^{i}}n_{t_i}e^{-h_{t_i}}\prod_{j\in \partial i}\sum_{t_j}c_{t_it_j}\psi_{t_j}^{j\to i}\tag{3.1.7}
 $$
@@ -278,114 +303,158 @@ $$
 ## Phase Transition
 
 考虑一个特殊的情况：一个由SBM模型生成的无向图，每一个组$a$的平均度$c$都相等：
+
 $$
 \sum_{d=1}^qc_{ad}n_d=\sum_{d=1}^qc_{bd}n_d=c\tag{4.0.1}
 $$
+
 注：$c_{ad}n_d=Np_{ad}n_d=N_dp_{ad}$，可以理解为组$a$平均每个点连接到组$d$的边的数量，在对所有组$d$遍历求和，即为组$a$的平均度。满足这样条件的模型叫做：factorized block model.
 
 ### Factorized fixed point
 
 BP：(3.1.6)和(3.1.7)，的一个不动点(叫做factorized fixed point)为：
+
 $$
 \psi_{t_i}^{i\to j}=n_{t_i}\tag{4.1.1}
 $$
+
 可以将不动点(4.1.1)代入(3.1.6)验证这个不动点：
+
 $$
 \begin{aligned}\psi_{t_i}^{i\to j}&=\frac{1}{Z^{i\to j}}n_{t_i}e^{-h_{t_i}}[\prod_{k\in \partial i\setminus j}\sum_{t_k}c_{t_it_k}\psi_{t_k}^{k\to i}]\\&= \frac{1}{Z^{i\to j}}n_{t_i}e^{-\frac{1}{N}\sum_{k\notin \partial i}\sum_{t_k}c_{t_kt_i}\psi_{t_k}^{k\to i}}[\prod_{k\in \partial i\setminus j}\sum_{t_k}c_{t_it_k}n_{t_k}]\\&=\frac{1}{Z^{i\to j}}n_{t_i}e^{-\frac{1}{N}\sum_{k\notin \partial i}\sum_{t_k}c_{t_kt_i}n_{t_k}}[\prod_{k\in \partial i\setminus j}\sum_{t_k}c_{t_it_k}n_{t_k}]\\&=\frac{1}{Z^{i\to j}}n_{t_i}e^{-\frac{1}{N}\sum_{k\notin \partial i}c}[\prod_{k\in \partial i\setminus j}c]\\&=\frac{n_{t_i}e^{-\frac{1}{N}\sum_{k\notin \partial i}c}\prod_{k\in \partial i\setminus j}c}{\sum_{n_{t_i}}n_{t_i}e^{-\frac{1}{N}\sum_{k\notin \partial i}c}\prod_{k\in \partial i\setminus j}c}\\&=n_{t_i}\end{aligned}
 $$
+
 将这个factorized fixed point代入(3.1.7)，得到边际分布：
+
 $$
 \begin{aligned}\psi_{t_i}^i&=\frac{1}{Z^{i}}n_{t_i}e^{-h_{t_i}}\prod_{j\in \partial i}\sum_{t_j}c_{t_it_j}\psi_{t_j}^{j\to i}\\&=\frac{1}{Z^{i}}n_{t_i}e^{-h_{t_i}}\prod_{j\in \partial i}\sum_{t_j}c_{t_it_j}n_{t_j}\\&=\frac{1}{Z^{i}}n_{t_i}e^{-h_{t_i}}\prod_{j\in \partial i}c\\&=n_{t_i}\end{aligned}
 $$
+
 可以看出，每一个节点的分布与该节点没有关系，若根据这个分布inferring the group assignment，则每一个节点的group都是最大的group。计算这样的group assignment的overlap为0：
+
 $$
 Q(\left\{t_i\right\},\left\{q_i\right\})=max_\pi\frac{\frac{1}{N}\sum_i\delta_{t_i, \pi(q_i)}-max_an_a}{1-max_an_a}=\frac{max_aN_a/N-max_an_a}{1-max_an_a}=0
 $$
+
 这样的分布没有提供任何真实的group assignment的信息。如果BP算法收敛到这个不动点，则不可能还原真实的group assignment。以此，论文分析了在community detection中detectability-undetectability的相变点。
 
 ### Stability of  factorized fixed point
 
 考虑随机扰动BP算法中的边际分布对BP算法的factorized fixed point的影响。在一个稀疏网络的情况下，网络是局部树状的。考虑一个$d$层的树，对其叶子节点上的factorized fixed point的边际分布进行扰动:
+
 $$
 \psi_t^k=n_t + \epsilon_t^k\tag{4.2.1}
 $$
+
 然后研究在所有$c^d$个叶子节点上的扰动对根节点的影响。假设每个叶子节点的影响相互独立，考虑叶子节点到根节点的一条路径$d,d-1,d-2,...,i+1,i,...,1,0$。定义一个迁移矩阵：
+
 $$
 \begin{aligned}T_i^{ab}&=\frac{\partial\psi_a^i}{\partial\psi_b^{i+1}}|_{\psi_t=n_t}\\&=(\frac{\psi_a^ic_{ab}}{\sum_rc_{ar}\psi_r^{i+1}}-\psi_a^i\sum_s\frac{\psi_s^ic_{sb}}{\sum_rc_{ar}\psi_r^{i+1}})|_{\psi_t=n_t}\end{aligned}\tag{4.2.2}
 $$
+
 此公式推导还未知`TODO`。
 
 由公式(4.2.2)继续推导，利用(4.0.1)的平均度为$c$的假设：
+
 $$
 \begin{aligned}T_i^{ab}&=\frac{n_ac_{ab}}{\sum_rc_{ar}n_r}-n_a\sum_s\frac{n_sc_{sb}}{\sum_rc_{ar}n_r}\\&=\frac{n_ac_{ab}}{c}-n_a\frac{c}{c}\\&=n_a(\frac{c_{ab}}{c}-1)\end{aligned}\tag{4.2.3}
 $$
+
 得到迁移矩阵之后，我们可以得到相邻两个节点之间的边际概率的关系(一阶的泰勒公式)：
+
 $$
 \psi_a^i=\frac{\partial\psi_a^i}{\partial\psi_b^{i+1}}\psi_b^{i+1}+{\psi_a^i}_{\psi_b^{i+1}=0}
 $$
+
 将公式(4.2.1)代入，可以得到相邻两个节点之间边际概率的扰动之间的关系：
+
 $$
 \begin{aligned}\epsilon_a^i&=\frac{\partial\psi_a^i}{\partial\psi_b^{i+1}}\epsilon_b^{i+1}\\&=T_i^{ab}\epsilon_b^{i+1}\end{aligned}
 $$
+
 $T_i^{ab}$与$i$无关，其矩阵形式记作$T$。每一个节点的边际分布$\epsilon^i$是一个向量($q$维)表示，上式可用矩阵表示为：
+
 $$
 \epsilon^i=T\epsilon^{i+1}
 $$
+
 最终可以得到这条路径的叶子节点与根节点的扰动之间的关系：
+
 $$
 \epsilon^0=T^d\epsilon^d\tag{4.2.4}
 $$
+
 当$d\to \infty$时，$T^d$由$T$的绝对值最大的特征值$\lambda$主导即：
+
 $$
 \epsilon^0\approx\lambda^d\epsilon^d
 $$
 
 > 这里举个例子解释下：若二维矩阵$T$有两个特征值：
+>
 > $$
 > Tv_1=\lambda_1,Tv_2=\lambda_2
 > $$
+>
 > 这两个特征向量组成二维平面的基，则任意向量$x$可分解为：
+>
 > $$
 > x=u_1v_1+u_2v_2
 > $$
+>
 > 则：
+>
 > $$
 > Tx=u_1\lambda_1v_1+u_2\lambda_2v_2\\
 > T^dx=u_1\lambda_1^dv_1+u_2\lambda_2^dv_2
 > $$
+>
 > 易见，$d\to \infty$时，$T^dx$由$T$的两个特征值中绝对值较大的一个主导。
 
-假设$c^d$个叶子节点上的扰动$(\epsilon^{dk}, k \in 1,2,...,c^d)$均值为0： $\left\langle\epsilon^{dk}\right \rangle=0$。则根上扰动的均值也为0：
+假设$c^d$个叶子节点上的扰动$(\epsilon^{dk}, k \in 1,2,...,c^d)$均值为0： $$\left\langle\epsilon^{dk}\right \rangle=0$$。则根上扰动的均值也为0：
+
 $$
 \left \langle \epsilon^0 \right \rangle=\left\langle \sum_k^{c^d}\lambda^d\epsilon^{dk}\right\rangle=0
 $$
+
 而根上扰动的方差为：
+
 $$
 \begin{aligned}\left \langle (\epsilon^0)^2 \right \rangle&=\left\langle (\sum_k^{c^d}\lambda^d\epsilon^{dk})^2\right\rangle\\&=\lambda^{2d}\left\langle (\sum_k^{c^d}\epsilon^{dk})^2 \right\rangle\\&=\lambda^{2d}\left\langle \sum_k^{c^d}(\epsilon^{dk})^2 + 2\sum_{k_1,k_2}\epsilon^{dk_1}\epsilon^{dk_2} \right\rangle\\&=\lambda^{2d}\left\langle \sum_k^{c^d}(\epsilon^{dk})^2\right\rangle\\&\approx\lambda^{2d}c^d\left\langle (\epsilon^{dk})^2\right\rangle,k\in1,2,3,...,c^d\end{aligned}\tag{4.2.5}
 $$
+
 假设每一个叶子节点扰动$\epsilon^{dk}$是一个均值为0，方差为1的高斯分布，则上式倒数第二个等式可以理解为两个均值为0的高斯分布的乘积仍未均值为0的高斯分布。上式最后一个等式为在$d\to \infty$时的近似。
 
 > 高斯分布的公式为：
+>
 > $$
 > f(x)=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-\mu)^2}{2\sigma^2}}
 > $$
+>
 > 设两个高斯分布为$N\sim (\mu_1, \sigma_1)$，$N\sim (\mu_2, \sigma_2)$。则两个分布乘积的pdf为:
+>
 > $$
 > g(x)=\frac{1}{2\pi\sigma_1\sigma_2}e^{-\frac{(x-\mu_1)^2}{2\sigma_1^2}-\frac{(x-\mu_2)^2}{2\sigma_2^2}}
 > $$
+>
 > 考虑高斯分布的指数部分$-\frac{(x-\mu)^2}{2\sigma^2}$，其一阶导数的零点为高斯分布的均值。对$g(x)$的指数部分求一阶导，计算均值得到$g(x)$的均值为：
+>
 > $$
 > \begin{aligned}\frac{(x-\mu_1)^2}{2\sigma_1^2}+\frac{(x-\mu_2)^2}{2\sigma_2^2}&=0\\x&=\frac{\frac{\mu_1}{2\sigma_1^2}+\frac{\mu_2}{2\sigma_2^2}}{\frac{1}{2\sigma_1^2}+\frac{1}{2\sigma_2^2}}\\x&=\frac{\mu_1\sigma_2^2+\mu_2\sigma_1^2}{\sigma_1^2+\sigma_2^2}\end{aligned}
 > $$
+>
 > 所以，如果两个高斯分布均值都为0，则它们的乘积的均值也为0。
 
 由公式(4.2.5)可知，当$\lambda^2c<1$时，叶子节点上的扰动方差对根部节点的影响会逐渐消散，不动点稳定。而相反$\lambda^2c>1$时，这个影响会逐步放大，对不动点稍微的扰动就会使结果脱离不动点，不动点不稳定。所以不动点稳定的临界条件为：
+
 $$
 c\lambda^2=1\tag{4.2.6}
 $$
+
 考虑模型所有$q$个组大小相等，$c_{aa}=c_{in}$，$c_{ab}=c_{out}$。根据公式(4.2.3)，可以验证，矩阵$T$有两个特征值：$\lambda_1=0$，对应特征向量$(1,1,1,...,1)$；$\lambda_2=(c_{in}-c_{out})/qc$，对应特征向量形式为$(0,0,1,-1,0,0,...,0)$。
 
 > 在本节的条件下，矩阵$T$为:
+>
 > $$
 > T=\begin{bmatrix}
 > n_1(\frac{c_{11}}{c}-1)& n_1(\frac{c_{12}}{c}-1) & ... & n_1(\frac{c_{1q}}{c}-1)\\ 
@@ -394,18 +463,25 @@ $$
 > n_q(\frac{c_{q1}}{c}-1)& n_q(\frac{c_{q2}}{c}-1) & ... & n_q(\frac{c_{qq}}{c}-1)
 > \end{bmatrix}
 > $$
+>
 > 由公式$\frac{c_{in}+(q-1)c_{out}}{q}=c$有:
+>
 > $$
 > T\overrightarrow{1}=\begin{bmatrix}n_1(\frac{c_{in}+(q-1)c_{out}}{c}-q)\\.\\.\\.\end{bmatrix}=\overrightarrow{0}=0\overrightarrow{1}
 > $$
+>
 > 另由$n_1=n_2=...=\frac{1}{q}$：
+>
 > $$
 > T\begin{bmatrix}1\\-1\\0\\.\\.\\.\\0\end{bmatrix}=\begin{bmatrix}n_1\frac{c_{in}-c_{out}}{c}\\n_2\frac{c_{out}-c_{in}}{c}\\0\\.\\.\\.\\0\end{bmatrix}=\frac{c_{in}-c_{out}}{qc}\begin{bmatrix}1\\-1\\0\\.\\.\\.\\0\end{bmatrix}
 > $$
+>
 > 可以看出$\lambda_2=(c_{in}-c_{out})/qc$的特征值为q-1阶。
 
 将$\lambda_2$代入(4.2.6)有：
+
 $$
 |c_{in}-c_{out}|=q\sqrt{c}\tag{4.2.7}
 $$
-当$|c_{in}-c_{out}|>q\sqrt{c}$时，factorized fixed point是不稳定的，社团是可检测的。这直观看也很合理，当组内的连边比组外连边更多时，网络的社团结构更清晰，更容易检测。
+
+当$\|c_{in}-c_{out}\|>q\sqrt{c}$时，factorized fixed point是不稳定的，社团是可检测的。这直观看也很合理，当组内的连边比组外连边更多时，网络的社团结构更清晰，更容易检测。
