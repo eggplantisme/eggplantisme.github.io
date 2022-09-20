@@ -1,3 +1,12 @@
+---
+
+layout: post
+title: Anaconda Tips
+tags: [environment]
+date: 2022-05-17 01:56
+toc: true
+---
+
 ## 常用命令
 
 - 创建环境 `conda create --name envname`
