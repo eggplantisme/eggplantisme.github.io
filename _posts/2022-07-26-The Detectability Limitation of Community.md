@@ -264,7 +264,7 @@ $$
 \psi_{t_i}^{i\to j}=\frac{1}{Z^{i\to j}}n_{t_i}\prod_{k\in \partial i\setminus  j}\sum_{t_k}c_{t_it_k}^{A_{ik}}(1-\frac{c_{t_it_k}}{N})^{1-A_{ik}}\psi_{t_k}^{k\to i}\tag{3.1.4}
 $$
 
-多了一项$$n_{t_i}$$，目前未知缘由`TODO`，我们以论文中的公式往下捋。
+多了一项$$n_{t_i}$$，这里表示的应该是先验概率，prior*likelyhood=posterior，我们以论文中的公式往下捋。
 
 由公式(3.1.4)，可以得知边际概率为：
 
