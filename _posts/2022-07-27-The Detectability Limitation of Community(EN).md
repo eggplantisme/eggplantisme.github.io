@@ -3,6 +3,7 @@ layout: post
 title: The Detectability Limitation of Community(EN)
 tags: [Algorithm]
 date: 2022-07-27 18:46
+toc: true
 ---
 This is a note mainly about the paper in 2011：[Asymptotic analysis of SBM](https://www.lri.fr/~adecelle/content/sc_articles/pre_84_066106.pdf). And also other paper corresponding with this topic:  [Cristo Moore](https://arxiv.org/pdf/1702.00467.pdf), 
 
@@ -194,9 +195,7 @@ $$
 
 Similarly we can defined energy density $$u(\beta)$$和 entropy density $$s(\beta)$$.
 
-#### Ising Model
-
-`TODO`
+#### Ising Model(See Post Later)
 
 ###  Parameter learning
 
@@ -781,3 +780,30 @@ $$
 $$
 
 Then we can define $$\frac{(c_{in}-c_{out})^2}{qc_{in}+q(q-1)c_{out}}$$ as SNR(signal to noise), when $$q=2$$, as there are 2 blocks, $$snr=\frac{(c_{in}-c_{out})^2}{2(c_{in}+c_{out})}$$.
+
+But this SNR is only for symmetric SBM case. According to [Achieving the KS threshold in the general SBM with linearized ABP](https://proceedings.neurips.cc/paper/2016/file/6c29793a140a811d0c45ce03c1c93a28-Paper.pdf), for a general SBM(means $$n_a$$ could be difference and affinity matrix could not symmetric), define that:
+
+
+$$
+P=\begin{bmatrix}
+ n_1& 0 &... &0 \\ 
+ 0& n_2 &...&0\\
+ ...&...&...&...\\
+ 0&0&...&n_q
+\end{bmatrix}
+$$
+
+$$
+Q=\begin{bmatrix}
+ c_{11}& c_{12} &...&c_{1q} \\ 
+ c_{21}& c_{22} &...&c_{2q} \\
+ ...&...&...&...\\
+ c_{q1}&c_{q2}&...&c_{qq}
+\end{bmatrix}
+$$
+
+The eigenvalue of $$PQ$$ is $$\lambda_1,\lambda_2,...,\lambda_q$$ with nonincreasing order of magnitude. Then the SNR of this SBM is
+$$
+SNR=\frac{\lambda_2^2}{\lambda_1}
+$$
+Similarly, when $$SNR>1$$, there exists efficient methods to detect the community better than chance.
